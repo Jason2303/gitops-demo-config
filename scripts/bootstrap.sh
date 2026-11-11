@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 CLUSTER="${CLUSTER:-gitops-demo}"
 ARGOCD_VERSION="${ARGOCD_VERSION:-stable}"   # pin e.g. v3.1.0 for reproducibility
 
-if grep -rq "YOUR_GH_USER" argocd apps; then
+if grep -rq "jason2303" argocd apps; then
   echo "ERROR: run ./scripts/set-github-user.sh <your-github-user> first"; exit 1
 fi
 

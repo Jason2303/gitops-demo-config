@@ -11,7 +11,7 @@ spec:
   description: Demo app - staging and production
   # Only this config repo may be a source
   sourceRepos:
-    - https://github.com/YOUR_GH_USER/gitops-demo-config.git
+    - https://github.com/jason2303/gitops-demo-config.git
   # Only these two namespaces on the local cluster
   destinations:
     - server: https://kubernetes.default.svc

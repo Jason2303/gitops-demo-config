@@ -5,7 +5,7 @@ Nobody runs `kubectl apply`; ArgoCD continuously reconciles the cluster to match
 
 | Repo | Purpose |
 |---|---|
-| [`gitops-demo-app`](https://github.com/YOUR_GH_USER/gitops-demo-app) | Application code + CI (test → build → push image → bump tag here) |
+| [`gitops-demo-app`](https://github.com/jason2303/gitops-demo-app) | Application code + CI (test → build → push image → bump tag here) |
 | **`gitops-demo-config`** (this repo) | Kustomize manifests, ArgoCD project/ApplicationSet/RBAC/notifications |
 
 ---

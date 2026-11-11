@@ -34,7 +34,7 @@ spec:
     spec:
       project: demo
       source:
-        repoURL: https://github.com/YOUR_GH_USER/gitops-demo-config.git
+        repoURL: https://github.com/jason2303/gitops-demo-config.git
         targetRevision: main
         path: "apps/demo-app/overlays/{{.env}}"
       destination:

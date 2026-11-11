@@ -1,4 +1,4 @@
 # Every change needs a review; production + ArgoCD config need the release owners.
-*                                    @YOUR_GH_USER
-/apps/demo-app/overlays/production/  @YOUR_GH_USER
-/argocd/                             @YOUR_GH_USER
+*                                    @jason2303
+/apps/demo-app/overlays/production/  @jason2303
+/argocd/                             @jason2303

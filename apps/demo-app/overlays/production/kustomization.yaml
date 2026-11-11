@@ -26,5 +26,5 @@ patches:
 # Changed ONLY by the "Promote to production" workflow (PR + approval).
 images:
   - name: demo-app
-    newName: ghcr.io/YOUR_GH_USER/gitops-demo-app
+    newName: ghcr.io/jason2303/gitops-demo-app
     newTag: latest
