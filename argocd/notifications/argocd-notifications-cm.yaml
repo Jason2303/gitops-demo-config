@@ -1,0 +1,52 @@
+# ArgoCD Notifications -> Slack incoming webhook.
+# The webhook URL is NOT here: it is read from the `argocd-notifications-secret`
+# Secret (key: slack-webhook-url), created via scripts/create-notification-secret.sh
+# or as a SealedSecret (scripts/seal-notification-secret.sh).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+data:
+  context: |
+    argocdUrl: https://localhost:8080
+
+  service.webhook.slack-webhook: |
+    url: $slack-webhook-url
+    headers:
+      - name: Content-Type
+        value: application/json
+
+  template.app-sync-succeeded: |
+    webhook:
+      slack-webhook:
+        method: POST
+        body: |
+          {"text": ":white_check_mark: *{{.app.metadata.name}}* synced successfully\nRevision: `{{.app.status.sync.revision}}`\n<{{.context.argocdUrl}}/applications/{{.app.metadata.name}}|Open in ArgoCD>"}
+
+  template.app-sync-failed: |
+    webhook:
+      slack-webhook:
+        method: POST
+        body: |
+          {"text": ":x: *{{.app.metadata.name}}* sync FAILED\n{{.app.status.operationState.message}}\n<{{.context.argocdUrl}}/applications/{{.app.metadata.name}}|Open in ArgoCD>"}
+
+  template.app-health-degraded: |
+    webhook:
+      slack-webhook:
+        method: POST
+        body: |
+          {"text": ":warning: *{{.app.metadata.name}}* is DEGRADED\n<{{.context.argocdUrl}}/applications/{{.app.metadata.name}}|Open in ArgoCD>"}
+
+  trigger.on-sync-succeeded: |
+    - when: app.status.operationState != nil and app.status.operationState.phase in ['Succeeded']
+      oncePer: app.status.sync.revision
+      send: [app-sync-succeeded]
+
+  trigger.on-sync-failed: |
+    - when: app.status.operationState != nil and app.status.operationState.phase in ['Error', 'Failed']
+      send: [app-sync-failed]
+
+  trigger.on-health-degraded: |
+    - when: app.status.health.status == 'Degraded'
+      send: [app-health-degraded]

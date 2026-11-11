@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-app-production
+  namespace: argocd
+  labels:
+    environment: production
+    sync-mode: manual
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack-webhook: ""
+    notifications.argoproj.io/subscribe.on-sync-failed.slack-webhook: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.slack-webhook: ""
+spec:
+  project: demo
+  source:
+    repoURL: https://github.com/YOUR_GH_USER/gitops-demo-config.git
+    targetRevision: main
+    path: apps/demo-app/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo-production
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers: ["/spec/replicas"]   # owned by HPA
+  # NO `automated` block => ArgoCD only shows OutOfSync; a release manager must click Sync.
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: restricted

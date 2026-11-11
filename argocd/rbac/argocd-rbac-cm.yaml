@@ -1,0 +1,43 @@
+# ArgoCD RBAC: who can do what in the UI/CLI.
+# - developers: see the demo project, sync/rollback STAGING only
+# - release-managers: may also sync PRODUCTION (the manual approval step)
+# - nobody except admins may create/edit/delete Applications by hand (Git is the source of truth)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: argocd
+data:
+  # Authenticated users with no group get nothing.
+  policy.default: ""
+  scopes: "[groups, email]"
+  policy.csv: |
+    # ---------- developer ----------
+    p, role:developer, applications, get,      demo/*,                 allow
+    p, role:developer, applications, sync,     demo/*-staging,         allow
+    p, role:developer, applications, action/*, demo/*-staging,         allow
+    p, role:developer, applications, sync,     demo/*-production,      deny
+    p, role:developer, logs,         get,      demo/*,                 allow
+    p, role:developer, projects,     get,      demo,                   allow
+    p, role:developer, repositories, get,      *,                      allow
+    p, role:developer, clusters,     get,      *,                      allow
+
+    # ---------- release manager (production approver) ----------
+    p, role:release-manager, applications, get,      demo/*,  allow
+    p, role:release-manager, applications, sync,     demo/*,  allow
+    p, role:release-manager, applications, action/*, demo/*,  allow
+    p, role:release-manager, logs,         get,      demo/*,  allow
+    p, role:release-manager, projects,     get,      demo,    allow
+    p, role:release-manager, repositories, get,      *,       allow
+    p, role:release-manager, clusters,     get,      *,       allow
+
+    # ---------- bindings ----------
+    # Local demo users (see argocd-cm accounts in scripts/bootstrap.sh)
+    g, dev-alice,   role:developer
+    g, release-bob, role:release-manager
+    # With SSO (Dex/GitHub/OIDC) bind groups instead, e.g.:
+    # g, YOUR_GH_ORG:developers,     role:developer
+    # g, YOUR_GH_ORG:release-managers, role:release-manager
+    # g, YOUR_GH_ORG:platform-team,  role:admin

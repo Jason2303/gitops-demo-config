@@ -1,0 +1,41 @@
+# AppProject = the security boundary for the demo app.
+# Restricts WHERE apps can deploy from/to and WHAT they can create.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: demo
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Demo app - staging and production
+  # Only this config repo may be a source
+  sourceRepos:
+    - https://github.com/YOUR_GH_USER/gitops-demo-config.git
+  # Only these two namespaces on the local cluster
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: demo-staging
+    - server: https://kubernetes.default.svc
+      namespace: demo-production
+  # Cluster-scoped: only Namespace (needed for CreateNamespace=true)
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  # Namespaced: app teams can't touch quotas/limits/RBAC from their app
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: ResourceQuota
+    - group: ""
+      kind: LimitRange
+    - group: rbac.authorization.k8s.io
+      kind: "*"
+  # Report anything in these namespaces that ArgoCD does not manage
+  orphanedResources:
+    warn: true
+  roles:
+    # Project-scoped roles (usable for CI tokens). Human RBAC lives in argocd-rbac-cm.
+    - name: ci-readonly
+      description: Read-only token for CI to query sync status
+      policies:
+        - p, proj:demo:ci-readonly, applications, get, demo/*, allow

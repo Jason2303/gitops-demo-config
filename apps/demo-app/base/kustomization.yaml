@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - serviceaccount.yaml
+  - deployment.yaml
+  - service.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: demo-app
+      app.kubernetes.io/managed-by: argocd
+    includeSelectors: false
+
+# Config is generated so any change gets a new hashed name -> automatic rollout.
+configMapGenerator:
+  - name: demo-app-config
+    literals:
+      - ENVIRONMENT=base
+      - LOG_LEVEL=info
