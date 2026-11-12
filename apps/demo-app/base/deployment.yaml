@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: demo-app
 spec:
-  replicas: 2                      # overridden per environment
+  replicas: 2 # overridden per environment
   revisionHistoryLimit: 5
   strategy:
     type: RollingUpdate
@@ -29,7 +29,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: demo-app
-          image: demo-app            # logical name; real image + tag set by overlays' `images:`
+          image: demo-app # logical name; real image + tag set by overlays' `images:`
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -43,12 +43,14 @@ spec:
               port: http
             initialDelaySeconds: 3
             periodSeconds: 5
+            timeoutSeconds: 2
           livenessProbe:
             httpGet:
               path: /healthz
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 3
           resources:
             requests:
               cpu: 50m
@@ -62,8 +64,15 @@ spec:
             capabilities:
               drop: ["ALL"]
           volumeMounts:
-            - name: tmp              # gunicorn needs a writable /tmp
+            - name: tmp # gunicorn needs a writable /tmp
               mountPath: /tmp
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 30
       volumes:
         - name: tmp
           emptyDir: {}
