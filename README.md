@@ -202,3 +202,9 @@ Note: ArgoCD's own UI "Rollback" button is disabled for auto-synced apps on purp
 
 ## 7. Screenshots
 See [`docs/screenshots/`](docs/screenshots/).
+
+## 8. Evidence notes and known limitations
+- **Shown live (see `docs/screenshots/`):** code push triggers CI; CI builds, scans and pushes the image and commits the new tag to this repo; ArgoCD auto-deploys staging; promotion via PR; developer denied by RBAC; release manager reviews the diff and syncs production manually; both environments Synced in the ArgoCD dashboard.
+- **Production health shows "Degraded" on the local kind cluster.** The production overlay includes a HorizontalPodAutoscaler, and kind ships without metrics-server, so the HPA cannot read CPU metrics and ArgoCD reports it Degraded. The Deployment, Service and PodDisruptionBudget are healthy. Fix on kind: install metrics-server with `--kubelet-insecure-tls`; managed clusters (EKS) include it.
+- **Drift and rollback:** implemented in `scripts/demo-drift.sh` (kubectl scale on staging is reverted by self-heal) and `scripts/demo-rollback.sh` (`git revert` of the last tag change; staging redeploys the previous image, production after a manual sync). Not captured as screenshots because of time.
+- **Issues fixed while running the pipeline:** an invalid Trivy action tag (Trivy now runs from its official image), a missing `pytest.ini` import path, and an empty deploy-key secret (checkout silently fell back to the read-only `GITHUB_TOKEN`).

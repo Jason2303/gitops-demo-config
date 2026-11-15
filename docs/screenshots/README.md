@@ -1,16 +1,11 @@
-# Screenshots for submission
+# Screenshots
 
-Save these PNGs in this folder:
-
-| File | What to capture |
+| File | Shows |
 |---|---|
-| `01-argocd-dashboard.png` | Applications page showing **demo-app-staging** and **demo-app-production** both *Synced / Healthy* |
-| `02-staging-tree.png` | demo-app-staging resource tree (Deployment → ReplicaSet → 1 Pod) |
-| `03-production-tree.png` | demo-app-production resource tree (3 Pods, HPA, PDB) |
-| `04-ci-run.png` | App repo Actions run: test → build-and-push → update-config-repo all green |
-| `05-config-commit.png` | Config repo commit `deploy(staging): demo-app sha-…` by gitops-bot |
-| `06-production-outofsync.png` | demo-app-production OutOfSync after promotion PR merged, before Sync |
-| `07-promote-approval.png` | Promote workflow waiting for `production` environment approval |
-| `08-drift-selfheal.png` | Terminal output of `scripts/demo-drift.sh` showing 5 → 1 |
-| `09-rollback.png` | ArgoCD history / `kubectl` showing the previous image after `git revert` |
-| `10-rbac-denied.png` | dev-alice getting "permission denied" when syncing production |
+| 01-ci-run | CI on push to main: lint + test, build + Trivy scan + push to GHCR, bump staging tag (all green) |
+| 02-config-commit | gitops-bot commit `deploy(staging): demo-app sha-0bb42f0` in this repo (CI -> GitOps hand-off) |
+| 03-staging-deployed | ArgoCD auto-deployed staging: app answers "Hello from GitOps v2", version sha-0bb42f0 |
+| 04-promotion-pr | Promotion PR copying the staging tag into the production overlay |
+| 05-rbac-dev-denied | dev-alice (developer) is denied syncing production (ArgoCD RBAC) |
+| 06-production-diff | release-bob reviews the production diff before the manual sync |
+| 07-argocd-both-synced | ArgoCD dashboard: demo-app-staging and demo-app-production both Synced |
