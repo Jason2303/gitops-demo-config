@@ -2,21 +2,20 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: demo-staging
 resources:
-  - ../../base
+- ../../base
 labels:
-  - pairs:
-      environment: staging
-    includeSelectors: false
+- pairs:
+    environment: staging
 configMapGenerator:
-  - name: demo-app-config
-    behavior: merge
-    literals:
-      - ENVIRONMENT=staging
-      - LOG_LEVEL=debug
+- behavior: merge
+  literals:
+  - ENVIRONMENT=staging
+  - LOG_LEVEL=debug
+  name: demo-app-config
 patches:
-  - path: patch-deployment.yaml
+- path: patch-deployment.yaml
 # Updated automatically by the app repo's CI (kustomize edit set image).
 images:
-  - name: demo-app
-    newName: ghcr.io/jason2303/gitops-demo-app
-    newTag: sha-12dd6af
+- name: demo-app
+  newName: ghcr.io/jason2303/gitops-demo-app
+  newTag: sha-0bb42f0
